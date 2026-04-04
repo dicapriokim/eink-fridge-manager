@@ -298,22 +298,72 @@ HA 대시보드에 버튼을 추가하여 필요할 때 즉시 화면을 갱신�
   * **E-ink 렌더링:** 수량 표기를 생략하고 2.9인치 패널에 텍스트가 잘리지 않도록 황금 비율(20자)로 설계된 3줄 와이드 레이아웃으로 자동 전환됩니다.
 
 ### 2. HA 스크립트 동적 분기 (Branching Logic)
-단기 / 장기에 떄라서 디스플레이에 표시될 내용이 달라집니다.
-스크립트에서 조건문으로 단기 / 장기 각각의 디스플레이 디자인 2가지로 자동 선택되게 할 수 있습니다.
+단기 / 장기 모드 및 설정 항목 개수(3개/4개)에 따라 디스플레이 레이아웃을 자동으로 전환하는 예제입니다.
 
 [스크립트 yaml 예제]
 
 ```yaml
+alias: 냉장고 E-ink 재고 (No.1) - 3Way 멀티 레이아웃
+description: 앱에서 주입된 변수(mode, count)에 따라 3가지 레이아웃을 자동 전환합니다.
 sequence:
   - choose:
       - conditions:
           - condition: template
-            value_template: "{{ mode == 'long' }}"
+            value_template: "{{ mode == 'long' and count == 4 }}"
+            alias: "장기 저장: 4줄 레이아웃"
         sequence:
           - action: gicisky.write
             target:
-              device_id:
-                - 2fea05a26af8bbb01907c40c27a7ac6d
+              device_id: <YOUR_DEVICE_ID>
+            data:
+              payload:
+                payload:
+                  - type: text
+                    x: 10
+                    "y": 8
+                    size: 14
+                    value: "{{ pummog1 | default('') }} {{ suryang1 | default('') }}"
+                  - type: rectangle
+                    x_start: 10
+                    y_start: 31
+                    x_end: 285
+                    y_end: 31
+                    fill: black
+                  - type: text
+                    x: 10
+                    "y": 40
+                    size: 14
+                    value: "{{ pummog2 | default('') }} {{ suryang2 | default('') }}"
+                  - type: rectangle
+                    x_start: 10
+                    y_start: 63
+                    x_end: 285
+                    y_end: 63
+                    fill: black
+                  - type: text
+                    x: 10
+                    "y": 72
+                    size: 14
+                    value: "{{ pummog3 | default('') }} {{ suryang3 | default('') }}"
+                  - type: rectangle
+                    x_start: 10
+                    y_start: 95
+                    x_end: 285
+                    y_end: 95
+                    fill: black
+                  - type: text
+                    x: 10
+                    "y": 104
+                    size: 14
+                    value: "{{ pummog4 | default('') }} {{ suryang4 | default('') }}"
+      - conditions:
+          - condition: template
+            value_template: "{{ mode == 'long' }}"
+            alias: "장기 저장: 3줄 레이아웃 (기본)"
+        sequence:
+          - action: gicisky.write
+            target:
+              device_id: <YOUR_DEVICE_ID>
             data:
               payload:
                 payload:
@@ -323,14 +373,77 @@ sequence:
                     x_end: 295
                     y_end: 38
                     fill: red
+                  - type: rectangle
+                    x_start: 0
+                    y_start: 39
+                    x_end: 295
+                    y_end: 128
+                    fill: yellow
+                  - type: icon
+                    x: 10
+                    "y": 3
+                    value: mdi:cart
+                    size: 30
+                    color: yellow
+                  - type: text
+                    x: 50
+                    "y": 8
+                    color: white
+                    size: 18
+                    value: "장기보관: {{ category | default('마트') }}"
+                  - type: text
+                    x: 10
+                    "y": 50
+                    size: 14
+                    value: "{{ pummog1 | default('') }}"
+                  - type: rectangle
+                    x_start: 10
+                    y_start: 69
+                    x_end: 285
+                    y_end: 69
+                    fill: black
+                  - type: text
+                    x: 10
+                    "y": 75
+                    size: 14
+                    value: "{{ pummog2 | default('') }}"
+                  - type: rectangle
+                    x_start: 10
+                    y_start: 94
+                    x_end: 285
+                    y_end: 94
+                    fill: black
+                  - type: text
+                    x: 10
+                    "y": 100
+                    size: 14
+                    value: "{{ pummog3 | default('') }}"
+                  - type: icon
+                    x: 250
+                    "y": 2
+                    size: 34
+                    color: white
+                    value: >-
+                      {% set weather = states('sensor.hyeonjaenalssi') %}
+                      {% if weather in ['sunny', 'clear', 'clear-night', '맑음'] %}
+                        mdi:weather-sunny
+                      {% elif weather in ['cloudy', 'partlycloudy', '흐림', '구름', '구름많음'] %}
+                        mdi:weather-cloudy
+                      {% elif weather in ['rain', 'pouring', '비', '비옴'] %}
+                        mdi:weather-pouring
+                      {% elif weather in ['snow', 'snowy', '눈', '눈옴'] %}
+                        mdi:weather-snowy
+                      {% else %}
+                        mdi:weather-partly-cloudy
+                      {% endif %}
       - conditions:
           - condition: template
             value_template: "{{ mode != 'long' }}"
+            alias: "단기 저장 레이아웃"
         sequence:
           - action: gicisky.write
             target:
-              device_id:
-                - 2fea05a26af8bbb01907c40c27a7ac6d
+              device_id: <YOUR_DEVICE_ID>
             data:
               payload:
                 payload:
@@ -340,9 +453,87 @@ sequence:
                     x_end: 295
                     y_end: 38
                     fill: red
-    enabled: true
-alias: 냉장고 E-ink 재고 스크립트
-description: v3 앱에서 주입된 변수를 사용하여 E-ink 화면을 직접 렌더링합니다.
+                  - type: rectangle
+                    x_start: 0
+                    y_start: 39
+                    x_end: 295
+                    y_end: 128
+                    fill: yellow
+                  - type: icon
+                    x: 10
+                    "y": 3
+                    value: mdi:cart
+                    size: 30
+                    color: yellow
+                  - type: text
+                    x: 50
+                    "y": 8
+                    color: white
+                    size: 18
+                    value: "{{ category | default('마트') }} 재고"
+                  - type: text
+                    x: 10
+                    "y": 50
+                    size: 14
+                    value: "{{ pummog1 | default('') }} {{ suryang1 | default('') }}"
+                  - type: text
+                    x: 10
+                    "y": 75
+                    size: 14
+                    value: "{{ pummog2 | default('') }} {{ suryang2 | default('') }}"
+                  - type: text
+                    x: 10
+                    "y": 100
+                    size: 14
+                    value: "{{ pummog3 | default('') }} {{ suryang3 | default('') }}"
+                  - type: text
+                    x: 105
+                    "y": 50
+                    size: 14
+                    value: "{{ pummog4 | default('') }} {{ suryang4 | default('') }}"
+                  - type: text
+                    x: 105
+                    "y": 75
+                    size: 14
+                    value: "{{ pummog5 | default('') }} {{ suryang5 | default('') }}"
+                  - type: text
+                    x: 105
+                    "y": 100
+                    size: 14
+                    value: "{{ pummog6 | default('') }} {{ suryang6 | default('') }}"
+                  - type: text
+                    x: 200
+                    "y": 50
+                    size: 14
+                    value: "{{ pummog7 | default('') }} {{ suryang7 | default('') }}"
+                  - type: text
+                    x: 200
+                    "y": 75
+                    size: 14
+                    value: "{{ pummog8 | default('') }} {{ suryang8 | default('') }}"
+                  - type: text
+                    x: 200
+                    "y": 100
+                    size: 14
+                    value: "{{ pummog9 | default('') }} {{ suryang9 | default('') }}"
+                  - type: icon
+                    x: 250
+                    "y": 2
+                    size: 34
+                    color: white
+                    value: >-
+                      {% set weather = states('sensor.hyeonjaenalssi') %}
+                      {% if weather in ['sunny', 'clear', 'clear-night', '맑음'] %}
+                        mdi:weather-sunny
+                      {% elif weather in ['cloudy', 'partlycloudy', '흐림', '구름', '구름많음'] %}
+                        mdi:weather-cloudy
+                      {% elif weather in ['rain', 'pouring', '비', '비옴'] %}
+                        mdi:weather-pouring
+                      {% elif weather in ['snow', 'snowy', '눈', '눈옴'] %}
+                        mdi:weather-snowy
+                      {% else %}
+                        mdi:weather-partly-cloudy
+                      {% endif %}
 ```
 
 ---
