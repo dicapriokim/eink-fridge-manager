@@ -1,0 +1,13 @@
+{
+    "categories": [
+        {
+            "id": "legacy_fridge",
+            "name": "item",
+            "config": {
+                "count": 9,
+                "script_entity": ""
+            },
+            "items": []
+        }
+    ]
+}
