@@ -140,6 +140,268 @@ You can add a button to your HA dashboard to manually trigger a screen refresh:
 - **Local Network**: Recommended for use within a secured local network or via VPN/Reverse Proxy.
 - **Unique ID Sync**: If you delete and recreate a category, its **Unique ID** will change. Don't forget to update the corresponding ID in your Home Assistant `secrets.yaml` to maintain the connection.
 
+### 7. Tips & Tricks
+
+#### 1. Input Modes (Dynamic UI)
+You can optimize the input environment based on the characteristics of each tab (e.g., Fridge vs. Kimchi Fridge). You can set the mode for each tab in **[System Settings]** at the bottom of the app.
+
+* **🍅 Short-term Mode (Standard / Default)**
+  * **Recommended Use**: Environments requiring frequent stock management such as Fridge, Pantry, etc.
+  * **Input Type**: Separate Item Name (Max 6 chars) + Quantity (Max 3 chars).
+  * **Display Settings**: Select 3 / 6 / 9 items.
+  * **E-ink Rendering**: Outputs in a 3x3 grid "Standard Layout".
+
+* **🧊 Long-term Mode (Memo-style)**
+  * **Recommended Use**: Environments where detailed memos (storage date, expiration date, etc.) are more important than quantity, such as Kimchi Fridge or storage rooms.
+  * **Input Type**: Wide text bar utilizing 100% width (Max 20 chars per line).
+  * **Display Settings**: Select 3 / 4 items.
+  * **E-ink Rendering**: Automatically switches to a "3 or 4-row Wide Layout" designed with a golden ratio (20 chars) to prevent text clipping on a 2.9-inch panel.
+
+#### 2. HA Script Branching Logic (Branching Logic)
+This is an example of automatically switching the display layout based on the mode (Short/Long) and the number of items (3/4).
+
+[Script YAML Example]
+
+```yaml
+alias: Fridge E-ink Inventory (No.1) - 3Way Multi Layout
+description: Automatically switches between 3 layouts based on injected variables (mode, count).
+sequence:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ mode == 'long' and count == 4 }}"
+            alias: "Long-term: 4-row Layout"
+        sequence:
+          - action: gicisky.write
+            target:
+              device_id: <YOUR_DEVICE_ID>
+            data:
+              payload:
+                payload:
+                  - type: rectangle
+                    x_start: 0
+                    y_start: 0
+                    x_end: 295
+                    y_end: 128
+                    fill: yellow
+                  - type: text
+                    x: 10
+                    "y": 8
+                    size: 14
+                    value: "{{ pummog1 | default('') }} {{ suryang1 | default('') }}"
+                  - type: rectangle
+                    x_start: 10
+                    y_start: 31
+                    x_end: 285
+                    y_end: 31
+                    fill: black
+                  - type: text
+                    x: 10
+                    "y": 40
+                    size: 14
+                    value: "{{ pummog2 | default('') }} {{ suryang2 | default('') }}"
+                  - type: rectangle
+                    x_start: 10
+                    y_start: 63
+                    x_end: 285
+                    y_end: 63
+                    fill: black
+                  - type: text
+                    x: 10
+                    "y": 72
+                    size: 14
+                    value: "{{ pummog3 | default('') }} {{ suryang3 | default('') }}"
+                  - type: rectangle
+                    x_start: 10
+                    y_start: 95
+                    x_end: 285
+                    y_end: 95
+                    fill: black
+                  - type: text
+                    x: 10
+                    "y": 104
+                    size: 14
+                    value: "{{ pummog4 | default('') }} {{ suryang4 | default('') }}"
+      - conditions:
+          - condition: template
+            value_template: "{{ mode == 'long' }}"
+            alias: "Long-term: 3-row Layout (Default)"
+        sequence:
+          - action: gicisky.write
+            target:
+              device_id: <YOUR_DEVICE_ID>
+            data:
+              payload:
+                payload:
+                  - type: rectangle
+                    x_start: 0
+                    y_start: 0
+                    x_end: 295
+                    y_end: 38
+                    fill: red
+                  - type: rectangle
+                    x_start: 0
+                    y_start: 39
+                    x_end: 295
+                    y_end: 128
+                    fill: yellow
+                  - type: icon
+                    x: 10
+                    "y": 3
+                    value: mdi:cart
+                    size: 30
+                    color: yellow
+                  - type: text
+                    x: 50
+                    "y": 8
+                    color: white
+                    size: 18
+                    value: "Long-term: {{ category | default('Mart') }}"
+                  - type: text
+                    x: 10
+                    "y": 50
+                    size: 14
+                    value: "{{ pummog1 | default('') }}"
+                  - type: rectangle
+                    x_start: 10
+                    y_start: 69
+                    x_end: 285
+                    y_end: 69
+                    fill: black
+                  - type: text
+                    x: 10
+                    "y": 75
+                    size: 14
+                    value: "{{ pummog2 | default('') }}"
+                  - type: rectangle
+                    x_start: 10
+                    y_start: 94
+                    x_end: 285
+                    y_end: 94
+                    fill: black
+                  - type: text
+                    x: 10
+                    "y": 100
+                    size: 14
+                    value: "{{ pummog3 | default('') }}"
+                  - type: icon
+                    x: 250
+                    "y": 2
+                    size: 34
+                    color: white
+                    value: >-
+                      {% set weather = states('sensor.hyeonjaenalssi') %}
+                      {% if weather in ['sunny', 'clear', 'clear-night', '맑음'] %}
+                        mdi:weather-sunny
+                      {% elif weather in ['cloudy', 'partlycloudy', '흐림', '구름', '구름많음'] %}
+                        mdi:weather-cloudy
+                      {% elif weather in ['rain', 'pouring', '비', '비옴'] %}
+                        mdi:weather-pouring
+                      {% elif weather in ['snow', 'snowy', '눈', '눈옴'] %}
+                        mdi:weather-snowy
+                      {% else %}
+                        mdi:weather-partly-cloudy
+                      {% endif %}
+      - conditions:
+          - condition: template
+            value_template: "{{ mode != 'long' }}"
+            alias: "Short-term Layout"
+        sequence:
+          - action: gicisky.write
+            target:
+              device_id: <YOUR_DEVICE_ID>
+            data:
+              payload:
+                payload:
+                  - type: rectangle
+                    x_start: 0
+                    y_start: 0
+                    x_end: 295
+                    y_end: 38
+                    fill: red
+                  - type: rectangle
+                    x_start: 0
+                    y_start: 39
+                    x_end: 295
+                    y_end: 128
+                    fill: yellow
+                  - type: icon
+                    x: 10
+                    "y": 3
+                    value: mdi:cart
+                    size: 30
+                    color: yellow
+                  - type: text
+                    x: 50
+                    "y": 8
+                    color: white
+                    size: 18
+                    value: "{{ category | default('Mart') }} Inventory"
+                  - type: text
+                    x: 10
+                    "y": 50
+                    size: 14
+                    value: "{{ pummog1 | default('') }} {{ suryang1 | default('') }}"
+                  - type: text
+                    x: 10
+                    "y": 75
+                    size: 14
+                    value: "{{ pummog2 | default('') }} {{ suryang2 | default('') }}"
+                  - type: text
+                    x: 10
+                    "y": 100
+                    size: 14
+                    value: "{{ pummog3 | default('') }} {{ suryang3 | default('') }}"
+                  - type: text
+                    x: 105
+                    "y": 50
+                    size: 14
+                    value: "{{ pummog4 | default('') }} {{ suryang4 | default('') }}"
+                  - type: text
+                    x: 105
+                    "y": 75
+                    size: 14
+                    value: "{{ pummog5 | default('') }} {{ suryang5 | default('') }}"
+                  - type: text
+                    x: 105
+                    "y": 100
+                    size: 14
+                    value: "{{ pummog6 | default('') }} {{ suryang6 | default('') }}"
+                  - type: text
+                    x: 200
+                    "y": 50
+                    size: 14
+                    value: "{{ pummog7 | default('') }} {{ suryang7 | default('') }}"
+                  - type: text
+                    x: 200
+                    "y": 75
+                    size: 14
+                    value: "{{ pummog8 | default('') }} {{ suryang8 | default('') }}"
+                  - type: text
+                    x: 200
+                    "y": 100
+                    size: 14
+                    value: "{{ pummog9 | default('') }} {{ suryang9 | default('') }}"
+                  - type: icon
+                    x: 250
+                    "y": 2
+                    size: 34
+                    color: white
+                    value: >-
+                      {% set weather = states('sensor.hyeonjaenalssi') %}
+                      {% if weather in ['sunny', 'clear', 'clear-night', '맑음'] %}
+                        mdi:weather-sunny
+                      {% elif weather in ['cloudy', 'partlycloudy', '흐림', '구름', '구름많음'] %}
+                        mdi:weather-cloudy
+                      {% elif weather in ['rain', 'pouring', '비', '비옴'] %}
+                        mdi:weather-pouring
+                      {% elif weather in ['snow', 'snowy', '눈', '눈옴'] %}
+                        mdi:weather-snowy
+                      {% else %}
+                        mdi:weather-partly-cloudy
+                      {% endif %}
+```
+
 ---
 
 <a name="한국어"></a>
