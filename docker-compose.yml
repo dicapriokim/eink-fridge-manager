@@ -9,7 +9,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - HA_URL=https://<YOUR_HA_IP>.31:8123
+      - HA_URL=https://<YOUR_HA_IP>:8123
       - HA_TOKEN=<YOUR_HA_TOKEN>
     volumes:
       - ./public:/usr/src/app/public
