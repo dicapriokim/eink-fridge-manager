@@ -49,11 +49,11 @@ Detailed instructions for connecting and installing E-ink displays with Home Ass
 
 #### Step 3: Configure Environment (Optimization)
 - This is a crucial step to modify the files to match your NAS and Home Assistant (HA) information.
-- **How**: Open `docker-compose.yaml` from the uploaded files with a text editor and modify `HA_URL` and `HA_TOKEN` with your information. You can also decide the access port here (default is 3000).
+- **How**: Rename `docker-compose.example.yml` to `docker-compose.yml`. Open it with a text editor and modify `HA_URL` and `HA_TOKEN` with your information. You can also decide the access port here (default is 3000).
 
 #### Step 4: Deploy with Docker (Execution)
 - This step actually starts the server on your NAS based on the modified source.
-- **How**: Open the **Container Manager** app on your Synology NAS. Go to the **Project** menu, click **Create**, select the folder you uploaded files to, and build/run the project using `docker-compose.yaml`.
+- **How**: Open the **Container Manager** app on your Synology NAS. Go to the **Project** menu, click **Create**, select the folder you uploaded files to, and build/run the project using the `docker-compose.yml` you just configuration.
 
 #### Step 5: Initial App Setup (Internal Settings)
 - Once the server is running, access the UI via browser to create the fridge categories you want to manage.
@@ -187,11 +187,11 @@ E-ink 디스플레이와 HA의 연결 방법 및 설치는 Naver Cafe **@취밍*
 
 #### 단계 3: 환경 변수 설정 (설정 최적화)
 - 내 NAS와 Home Assistant(HA) 정보에 맞게 파일을 수정하는 중요한 단계입니다.  
-- **방법**: 업로드한 파일 중 `docker-compose.yaml`을 메모장 등으로 열어 `HA_URL`(HA 주소)과 `HA_TOKEN`(롱리브드 토큰)을 본인의 정보로 수정합니다. 접속 포트(기본 3000)도 여기서 결정합니다.
+- **방법**: 먼저 `docker-compose.example.yml` 파일의 이름을 `docker-compose.yml`로 변경합니다. 그 후 메모장 등으로 파일을 열어 `HA_URL`(HA 주소)과 `HA_TOKEN`(롱리브드 토큰)을 본인의 정보로 수정합니다. 접속 포트(기본 3000)도 여기서 결정합니다.
 
 #### 단계 4: Docker 컨테이너 생성 (배포 실행)
 - 수정한 소스를 바탕으로 NAS에서 서버를 실제로 가동시키는 단계입니다.
-- **방법**: 시놀로지 **Container Manager** 앱을 실행합니다. **프로젝트** 메뉴에서 **생성**을 누르고, 아까 파일을 올린 폴더를 선택한 뒤 `docker-compose.yaml`을 이용해 프로젝트를 빌드 및 실행합니다.
+- **방법**: 시놀로지 **Container Manager** 앱을 실행합니다. **프로젝트** 메뉴에서 **생성**을 누르고, 아까 파일을 올린 폴더를 선택한 뒤 설정 완료한 `docker-compose.yml`을 이용해 프로젝트를 빌드 및 실행합니다.
 
 #### 단계 5: 앱 초기 설정 및 탭 등록 (앱 내부 설정)
 - 서버가 켜지면 브라우저로 접속해 내가 관리할 냉장고 카테고리를 만드는 단계입니다.
