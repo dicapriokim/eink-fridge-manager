@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  fridge-manager:
+    build: .
+    image: eink-fridge-manager:latest
+    container_name: fridge-manager
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - HA_URL=https://<YOUR_HOMEASSISTANT_IP>:8123
+      - HA_TOKEN=YOUR_LONG_LIVED_ACCESS_TOKEN
+    volumes:
+      - ./public:/usr/src/app/public
+      - ./server.js:/usr/src/app/server.js
+      - ./data.json:/usr/src/app/data.json
