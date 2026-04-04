@@ -147,12 +147,17 @@ app.get('/api/inventory/:id', asyncHandler(async (req, res) => {
 app.get('/api/ha/:id', asyncHandler(async (req, res) => {
     const { id } = req.params;
     const data = await readData();
-    const cat = data.categories.find(c => c.id === id);
+    const catIndex = data.categories.findIndex(c => c.id === id);
+    const cat = data.categories[catIndex];
+
     if (!cat) return res.status(404).json({ error: 'HA 센서 대상을 찾을 수 없습니다.' });
+
     res.json({
         id: cat.id,
+        slot: String(catIndex + 1), // 신규 추가 (일관성 확보)
         name: cat.name,
         mode: cat.config?.mode || 'short',
+        count: cat.config?.count || 9, // count 명시적 포함
         items: cat.items || []
     });
 }));
@@ -228,7 +233,20 @@ app.post('/api/refresh/:id', asyncHandler(async (req, res) => {
 
     const itemsToProcess = incomingItems || cat.items || [];
     const mode = cat.config?.mode || 'short';
-    const flattenedVariables = { id: id, category: cat.name, mode: mode, count: itemsToProcess.length };
+    const catIndex = data.categories.findIndex(c => c.id === id);
+    const flattenedVariables = {
+        id: id,            // 원본 고유 ID 유지 (String)
+        slot: String(catIndex + 1), // 신규 슬롯 번호 (String "1", "2", "3", "4")
+        category: cat.name,
+        mode: mode,
+        count: itemsToProcess.length
+    };
+
+    // [v5.1.3] HA 템플릿 에러 방지를 위한 9개 항목 패딩 처리
+    for (let i = 1; i <= 9; i++) {
+        flattenedVariables[`pummog${i}`] = '';
+        flattenedVariables[`suryang${i}`] = '';
+    }
 
     // [Point 2 & Point 3] 만약 새로운 데이터가 왔다면 즉시 저장 (레이스 컨디션 방지)
     if (incomingItems) {
@@ -241,9 +259,11 @@ app.post('/api/refresh/:id', asyncHandler(async (req, res) => {
     }
 
     itemsToProcess.forEach((item, index) => {
-        validateItem(item, mode); // 이미 위에서 했지만, cat.items인 경우를 대비해 유지
-        flattenedVariables[`pummog${index + 1}`] = item.pummog || '';
-        flattenedVariables[`suryang${index + 1}`] = item.suryang || '';
+        if (index < 9) { // 최대 9개까지만 변수 주입
+            validateItem(item, mode);
+            flattenedVariables[`pummog${index + 1}`] = item.pummog || '';
+            flattenedVariables[`suryang${index + 1}`] = item.suryang || '';
+        }
     });
 
     // [v4.2.7] URL 정제 (Trailing Slash 제거)
@@ -255,6 +275,9 @@ app.post('/api/refresh/:id', asyncHandler(async (req, res) => {
     const token = (process.env.HA_TOKEN || '').trim();
 
     try {
+        console.log(`[HA SYNC] 서비스 호출 시도: ${targetUrl} (Slot: ${catIndex + 1})`);
+        console.log(`[HA SYNC] 전송 데이터 요약: ID=${id}, Slot=${catIndex + 1}, Mode=${mode}, Count=${itemsToProcess.length}`);
+
         // 1차 시도: 직접 서비스 호출
         let response = await fetch(targetUrl, {
             method: 'POST',

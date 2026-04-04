@@ -1,6 +1,6 @@
 {
   "name": "eink-fridge-manager",
-  "version": "5.0.5",
+  "version": "5.1.2",
   "description": "Fridge Inventory Manager for Eink Display via Home Assistant",
   "main": "server.js",
   "scripts": {
