@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>E-ink 재고 관리 v5.0.5</title>
+    <title>E-ink 재고 관리 v5.1.2</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/7.2.96/css/materialdesignicons.min.css"
         rel="stylesheet">
     <style>
@@ -249,11 +249,32 @@
         .modal-content {
             width: 92%;
             max-width: 400px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
             background: #1e293b;
             border-radius: 28px;
             padding: 24px;
+            padding-bottom: 12px;
             border: var(--glass-border);
             box-shadow: var(--glass-shadow);
+        }
+
+        .modal-body {
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 8px;
+            margin-right: -8px;
+        }
+
+        /* 스크롤바 커스텀 */
+        .modal-body::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
         }
 
         .modal-header {
@@ -364,7 +385,7 @@
     <div class="container" id="app">
         <header>
             <h1>냉장고 품목 재고 관리 <span
-                    style="font-size: 0.8rem; vertical-align: top; font-weight: 400; opacity: 0.7;">v5.0.5</span></h1>
+                    style="font-size: 0.8rem; vertical-align: top; font-weight: 400; opacity: 0.7;">v5.1.2</span></h1>
         </header>
 
         <div class="tab-bar" id="tab-bar"></div>
@@ -383,7 +404,7 @@
         </div>
 
         <footer>
-            © 2026 Matter eink-fridge | Designed by 돼지지렁이 v.5.0.5
+            © 2026 Matter eink-fridge | Designed by 돼지지렁이 v.5.1.2
         </footer>
     </div>
 
@@ -397,200 +418,241 @@
                 </button>
             </div>
 
-            <div id="tab-specific-settings">
-                <!-- [자주 쓰는 설정] -->
-                <div class="form-group">
-                    <label class="form-label">탭 이름 변경</label>
-                    <input type="text" id="config-name" style="width: 100%;" placeholder="예: 냉장고">
-                </div>
+            <div class="modal-body">
+                <div id="tab-specific-settings">
+                    <!-- [자주 쓰는 설정] -->
+                    <div class="form-group">
+                        <label class="form-label">탭 이름 변경</label>
+                        <input type="text" id="config-name" style="width: 100%;" placeholder="예: 냉장고">
+                    </div>
 
-                <div class="form-group">
-                    <label class="form-label">입력 모드 (단기/장기)</label>
-                    <select id="config-mode" style="width: 100%;" onchange="updateConfigCountOptions()">
-                        <option value="short">단기 모드 (품목+수량)</option>
-                        <option value="long">장기 모드 (긴 텍스트 20자)</option>
-                    </select>
-                </div>
+                    <div class="form-group">
+                        <label class="form-label">입력 모드 (단기/장기)</label>
+                        <select id="config-mode" style="width: 100%;" onchange="updateConfigCountOptions()">
+                            <option value="short">단기 모드 (품목+수량)</option>
+                            <option value="long">장기 모드 (긴 텍스트 20자)</option>
+                        </select>
+                    </div>
 
-                <div class="form-group" id="group-config-count">
-                    <label class="form-label">화면 표시 항목 개수</label>
-                    <select id="config-count" style="width: 100%;">
-                        <!-- Options will be populated dynamically (v5.0.5) -->
-                    </select>
-                </div>
+                    <div class="form-group" id="group-config-count">
+                        <label class="form-label">화면 표시 항목 개수</label>
+                        <select id="config-count" style="width: 100%;">
+                            <!-- Options will be populated dynamically (v5.0.5) -->
+                        </select>
+                    </div>
 
-                <hr style="opacity:0.05; margin:20px 0;">
-                <div
-                    style="font-size:0.75rem; color:var(--accent-color); font-weight:700; margin-bottom:15px; opacity:0.8;">
-                    시스템 연동 설정 (초기 1회 권장)</div>
+                    <hr style="opacity:0.05; margin:20px 0;">
+                    <div
+                        style="font-size:0.75rem; color:var(--accent-color); font-weight:700; margin-bottom:15px; opacity:0.8;">
+                        시스템 연동 설정 (초기 1회 권장)</div>
 
-                <div class="form-group">
-                    <label class="form-label">HA 스크립트 엔티티 (갱신용)</label>
-                    <input type="text" id="config-script" style="width: 100%;" placeholder="script.eink_fridge">
-                    <div class="form-description">해당 카테고리를 담당하는 HA 스크립트 ID를 입력하세요.</div>
-                </div>
+                    <div class="form-group">
+                        <label class="form-label">HA 스크립트 엔티티 (갱신용)</label>
+                        <input type="text" id="config-script" style="width: 100%;" placeholder="script.eink_fridge">
+                        <div class="form-description">해당 카테고리를 담당하는 HA 스크립트 ID를 입력하세요.</div>
+                    </div>
 
-                <div class="form-group">
-                    <label class="form-label">카테고리 고유 ID (HA 연동용)</label>
-                    <div style="display:flex; gap:10px;">
-                        <input type="text" id="config-id" readonly
-                            style="flex:1; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.05); border-radius:12px; color:var(--accent-color); font-family:monospace; font-size:0.85rem; padding:10px 14px;"
-                            value="cat_...">
-                        <button class="btn-save" onclick="copyId()"
-                            style="width:48px; height:42px; border-radius:12px;"><i
-                                class="mdi mdi-content-copy"></i></button>
+                    <div class="form-group">
+                        <label class="form-label">카테고리 고유 ID (HA 연동용)</label>
+                        <div style="display:flex; gap:10px;">
+                            <input type="text" id="config-id" readonly
+                                style="flex:1; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.05); border-radius:12px; color:var(--accent-color); font-family:monospace; font-size:0.85rem; padding:10px 14px;"
+                                value="cat_...">
+                            <button class="btn-save" onclick="copyId()"
+                                style="width:48px; height:42px; border-radius:12px;"><i
+                                    class="mdi mdi-content-copy"></i></button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <button class="btn-main btn-modal-save" onclick="saveCurrentTabSettings()">설정 저장</button>
+                <button class="btn-main btn-modal-save" onclick="saveCurrentTabSettings()">설정 저장</button>
 
-            <hr style="opacity:0.05; margin:20px 0;">
+                <hr style="opacity:0.05; margin:20px 0;">
 
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <span style="font-size:0.85rem; font-weight:700; color:var(--accent-color);">동적 탭 관리 (v4.0)</span>
-                <button onclick="addNewCategory()"
-                    style="background:none; border:none; color:var(--accent-color); font-size:0.8rem; cursor:pointer;">+
-                    새 탭 추가</button>
-            </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="font-size:0.85rem; font-weight:700; color:var(--accent-color);">동적 탭 관리 (v4.0)</span>
+                    <button onclick="addNewCategory()"
+                        style="background:none; border:none; color:var(--accent-color); font-size:0.8rem; cursor:pointer;">+
+                        새 탭 추가</button>
+                </div>
 
-            <div class="tab-mgmt-list" id="tab-mgmt-list">
-                <!-- 탭 리스트 및 삭제 버튼 -->
+                <div class="tab-mgmt-list" id="tab-mgmt-list">
+                    <!-- 탭 리스트 및 삭제 버튼 -->
+                </div>
             </div>
         </div>
-    </div>
 
-    <script>
-        let categories = [];
-        let currentCatId = null;
-        let inventoryItems = [];
+        <script>
+            let categories = [];
+            let currentCatId = null;
+            let inventoryItems = [];
 
-        window.onload = () => initApp();
+            window.onload = () => initApp();
 
-        async function initApp() {
-            try {
-                const res = await fetch('/api/categories');
-                if (!res.ok) {
-                    const errInfo = await res.json().catch(() => ({}));
-                    throw new Error(errInfo.detail || res.statusText || '서버 응답 오류');
+            async function initApp() {
+                try {
+                    const res = await fetch('/api/categories');
+                    if (!res.ok) {
+                        const errInfo = await res.json().catch(() => ({}));
+                        throw new Error(errInfo.detail || res.statusText || '서버 응답 오류');
+                    }
+                    categories = await res.json();
+
+                    // [v5.0.3] URL에서 catId 파라미터 확인 후 즉시 제거 (휘발성 처리)
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const savedId = urlParams.get('catId');
+
+                    // 파라미터가 있으면 읽은 후 URL을 깨끗하게 정리 (다음 F5 시 첫 탭으로 돌아가게 함)
+                    if (savedId) {
+                        history.replaceState({}, document.title, window.location.pathname);
+                    }
+
+                    if (categories.length > 0) {
+                        // 저장된 ID가 있으면 해당 탭으로, 없으면 첫 번째 탭으로 초기화
+                        currentCatId = categories.find(c => c.id === savedId) ? savedId : categories[0].id;
+                        renderTabs();
+                        await loadInventory();
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showToast(`초기화 실패: ${err.message}`);
                 }
-                categories = await res.json();
-
-                // [v5.0.3] URL에서 catId 파라미터 확인 후 즉시 제거 (휘발성 처리)
-                const urlParams = new URLSearchParams(window.location.search);
-                const savedId = urlParams.get('catId');
-
-                // 파라미터가 있으면 읽은 후 URL을 깨끗하게 정리 (다음 F5 시 첫 탭으로 돌아가게 함)
-                if (savedId) {
-                    history.replaceState({}, document.title, window.location.pathname);
-                }
-
-                if (categories.length > 0) {
-                    // 저장된 ID가 있으면 해당 탭으로, 없으면 첫 번째 탭으로 초기화
-                    currentCatId = categories.find(c => c.id === savedId) ? savedId : categories[0].id;
-                    renderTabs();
-                    await loadInventory();
-                }
-            } catch (err) {
-                console.error(err);
-                showToast(`초기화 실패: ${err.message}`);
             }
-        }
 
-        function renderTabs() {
-            const bar = document.getElementById('tab-bar');
-            bar.innerHTML = '';
-            categories.forEach(cat => {
-                const div = document.createElement('div');
-                div.className = `tab-item ${cat.id === currentCatId ? 'active' : ''}`;
-                div.textContent = cat.name;
-                div.onclick = () => switchTab(cat.id);
-                bar.appendChild(div);
-            });
-        }
+            function renderTabs() {
+                const bar = document.getElementById('tab-bar');
+                bar.innerHTML = '';
+                categories.forEach(cat => {
+                    const div = document.createElement('div');
+                    div.className = `tab-item ${cat.id === currentCatId ? 'active' : ''}`;
+                    div.textContent = cat.name;
+                    div.onclick = () => switchTab(cat.id);
+                    bar.appendChild(div);
+                });
+            }
 
-        async function switchTab(id) {
-            if (currentCatId === id) return;
-            currentCatId = id;
-            renderTabs();
-            await loadInventory();
-        }
+            async function switchTab(id) {
+                if (currentCatId === id) return;
+                currentCatId = id;
+                renderTabs();
+                await loadInventory();
+            }
 
-        async function loadInventory() {
-            const container = document.getElementById('inventory-list');
-            container.innerHTML = '<div style="text-align:center; padding-top:80px; opacity:0.3;">데이터 로딩 중...</div>';
-            try {
-                const res = await fetch(`/api/inventory/${currentCatId}`);
-                inventoryItems = await res.json();
-                renderInventoryList();
-            } catch (err) { showToast('데이터 로딩 에러'); }
-        }
+            async function loadInventory() {
+                const container = document.getElementById('inventory-list');
+                container.innerHTML = '<div style="text-align:center; padding-top:80px; opacity:0.3;">데이터 로딩 중...</div>';
+                try {
+                    const res = await fetch(`/api/inventory/${currentCatId}`);
+                    inventoryItems = await res.json();
+                    renderInventoryList();
+                } catch (err) { showToast('데이터 로딩 에러'); }
+            }
 
-        function renderInventoryList() {
-            const container = document.getElementById('inventory-list');
-            container.innerHTML = '';
-            const cat = categories.find(c => c.id === currentCatId);
-            const mode = cat?.config?.mode || 'short';
-            const count = (cat?.config?.count) ? parseInt(cat.config.count) : (mode === 'long' ? 4 : 9);
+            function renderInventoryList() {
+                const container = document.getElementById('inventory-list');
+                container.innerHTML = '';
+                const cat = categories.find(c => c.id === currentCatId);
+                const mode = cat?.config?.mode || 'short';
+                const count = (cat?.config?.count) ? parseInt(cat.config.count) : (mode === 'long' ? 4 : 9);
 
-            for (let i = 0; i < count; i++) {
-                const item = inventoryItems.find(it => it.id == i + 1) || { id: i + 1, pummog: '', suryang: '' };
-                const div = document.createElement('div');
-                div.className = 'list-item';
+                for (let i = 0; i < count; i++) {
+                    const item = inventoryItems.find(it => it.id == i + 1) || { id: i + 1, pummog: '', suryang: '' };
+                    const div = document.createElement('div');
+                    div.className = 'list-item';
 
-                if (mode === 'long') {
-                    // 장기 모드: 100% 너비, 수량 없음, 20자 제한
-                    div.innerHTML = `
+                    if (mode === 'long') {
+                        // 장기 모드: 100% 너비, 수량 없음, 20자 제한
+                        div.innerHTML = `
                         <input type="text" class="input-pummog" style="flex:1;" id="p_${item.id}" value="${item.pummog}" placeholder="내용을 입력하세요 (최대 20자)" maxlength="20">
                         <button class="btn-save" onclick="saveRow(${item.id}, this)"><i class="mdi mdi-content-save"></i></button>
                     `;
-                } else {
-                    // 단기 모드: 기존 6자/3자 구성
-                    div.innerHTML = `
+                    } else {
+                        // 단기 모드: 기존 6자/3자 구성
+                        div.innerHTML = `
                         <input type="text" class="input-pummog" id="p_${item.id}" value="${item.pummog}" placeholder="품목" maxlength="6">
                         <input type="text" class="input-suryang" id="s_${item.id}" value="${item.suryang}" placeholder="수량" maxlength="3">
                         <button class="btn-save" onclick="saveRow(${item.id}, this)"><i class="mdi mdi-content-save"></i></button>
                     `;
+                    }
+                    container.appendChild(div);
                 }
-                container.appendChild(div);
-            }
-        }
-
-        async function saveRow(idx, btn) {
-            const cat = categories.find(c => c.id === currentCatId);
-            const mode = cat?.config?.mode || 'short';
-            const pummog = document.getElementById(`p_${idx}`).value.trim();
-            const suryang = mode === 'long' ? "" : document.getElementById(`s_${idx}`).value.trim();
-            const icon = btn.querySelector('i');
-            icon.className = 'mdi mdi-loading spin';
-            try {
-                const res = await fetch(`/api/inventory/${currentCatId}/${idx}`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pummog, suryang })
-                });
-                if (res.ok) {
-                    btn.classList.add('success');
-                    icon.className = 'mdi mdi-check';
-                    setTimeout(() => { btn.classList.remove('success'); icon.className = 'mdi mdi-content-save'; }, 2000);
-                }
-            } catch (err) { showToast('저장 실패'); icon.className = 'mdi mdi-alert'; }
-        }
-
-        async function refreshEink() {
-            const cat = categories.find(c => c.id === currentCatId);
-            if (!cat?.config?.script_entity) {
-                return showToast('최초 등록을 해주세요.');
             }
 
-            const btn = document.querySelector('.btn-refresh');
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<i class="mdi mdi-loading spin"></i> 저장 및 전송 중...';
-            btn.disabled = true;
+            async function saveRow(idx, btn) {
+                const cat = categories.find(c => c.id === currentCatId);
+                const mode = cat?.config?.mode || 'short';
+                const pummog = document.getElementById(`p_${idx}`).value.trim();
+                const suryang = mode === 'long' ? "" : document.getElementById(`s_${idx}`).value.trim();
+                const icon = btn.querySelector('i');
+                icon.className = 'mdi mdi-loading spin';
+                try {
+                    const res = await fetch(`/api/inventory/${currentCatId}/${idx}`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pummog, suryang })
+                    });
+                    if (res.ok) {
+                        btn.classList.add('success');
+                        icon.className = 'mdi mdi-check';
+                        setTimeout(() => { btn.classList.remove('success'); icon.className = 'mdi mdi-content-save'; }, 2000);
+                    }
+                } catch (err) { showToast('저장 실패'); icon.className = 'mdi mdi-alert'; }
+            }
 
-            try {
-                // 1. 현재 화면의 모든 필드 추출 (Point 2: 레이스 컨디션 방지)
+            async function refreshEink() {
+                const cat = categories.find(c => c.id === currentCatId);
+                if (!cat?.config?.script_entity) {
+                    return showToast('최초 등록을 해주세요.');
+                }
+
+                const btn = document.querySelector('.btn-refresh');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="mdi mdi-loading spin"></i> 저장 및 전송 중...';
+                btn.disabled = true;
+
+                try {
+                    // 1. 현재 화면의 모든 필드 추출 (Point 2: 레이스 컨디션 방지)
+                    const container = document.getElementById('inventory-list');
+                    const rows = container.querySelectorAll('.list-item');
+                    const mode = cat?.config?.mode || 'short';
+                    const items = [];
+
+                    rows.forEach((row, index) => {
+                        const pummog = row.querySelector('.input-pummog').value.trim();
+                        const suryang = mode === 'long' ? "" : row.querySelector('.input-suryang').value.trim();
+                        items.push({ id: index + 1, pummog, suryang });
+                    });
+
+                    // 2. HA 화면 갱신 신호 전송 (최신 데이터 포함)
+                    const res = await fetch(`/api/refresh/${currentCatId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ items })
+                    });
+
+                    if (res.ok) {
+                        showToast('데이터 저장 및 화면 갱신을 성공했습니다.');
+                        // 서버에서도 저장되었으므로 로컬 항목 업데이트 필요 시 loadInventory 호출 가능
+                        // 여기서는 즉시성 보강을 위해 무시하거나 간략 처리
+                    } else {
+                        const errData = await res.json().catch(() => ({}));
+                        if (res.status === 400 || res.status === 404) {
+                            showToast('엔티티 이름을 확인해주세요.');
+                        } else {
+                            showToast(`HA 오류: ${errData.detail || '서비스 호출 실패'}`);
+                        }
+                    }
+                } catch (err) {
+                    showToast('네트워크 오류: 서버 연결을 확인하세요.');
+                } finally {
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                }
+            }
+
+            async function saveAllFields() {
                 const container = document.getElementById('inventory-list');
                 const rows = container.querySelectorAll('.list-item');
+                const cat = categories.find(c => c.id === currentCatId);
                 const mode = cat?.config?.mode || 'short';
                 const items = [];
 
@@ -600,194 +662,154 @@
                     items.push({ id: index + 1, pummog, suryang });
                 });
 
-                // 2. HA 화면 갱신 신호 전송 (최신 데이터 포함)
-                const res = await fetch(`/api/refresh/${currentCatId}`, {
+                // [v4.3.1] 단 한 번의 호출로 모든 데이터를 원자적으로 저장하여 충돌 방지
+                const res = await fetch(`/api/inventory/${currentCatId}/bulk`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ items })
                 });
 
-                if (res.ok) {
-                    showToast('데이터 저장 및 화면 갱신을 성공했습니다.');
-                    // 서버에서도 저장되었으므로 로컬 항목 업데이트 필요 시 loadInventory 호출 가능
-                    // 여기서는 즉시성 보강을 위해 무시하거나 간략 처리
-                } else {
-                    const errData = await res.json().catch(() => ({}));
-                    if (res.status === 400 || res.status === 404) {
-                        showToast('엔티티 이름을 확인해주세요.');
-                    } else {
-                        showToast(`HA 오류: ${errData.detail || '서비스 호출 실패'}`);
-                    }
+                if (!res.ok) throw new Error('일괄 저장 실패');
+                console.log(`[SYSTEM] ${items.length}개 항목 일괄 저장 완료`);
+            }
+
+            // --- 설정 및 탭 관리 ---
+
+            function openSettings() {
+                if (categories.length === 0) {
+                    showToast('초기화되지 않은 상태입니다. 서버 연결을 확인하세요.');
+                    return;
                 }
-            } catch (err) {
-                showToast('네트워크 오류: 서버 연결을 확인하세요.');
-            } finally {
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
+                const cat = categories.find(c => c.id === currentCatId) || categories[0];
+                document.getElementById('modal-label').textContent = `${cat.name} 설정`;
+                document.getElementById('config-id').value = cat.id; // ID 표시
+                document.getElementById('config-mode').value = cat.config?.mode || 'short';
+
+                // 모드에 따라 개수 설정 동적 변경 (v5.0.5)
+                updateConfigCountOptions(cat.config?.count || (cat.config?.mode === 'long' ? 4 : 9));
+
+                document.getElementById('config-script').value = cat.config?.script_entity || '';
+                document.getElementById('config-name').value = cat.name;
+
+                renderTabMgmtList();
+                const modal = document.getElementById('modal-settings');
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('show'), 10);
             }
-        }
 
-        async function saveAllFields() {
-            const container = document.getElementById('inventory-list');
-            const rows = container.querySelectorAll('.list-item');
-            const cat = categories.find(c => c.id === currentCatId);
-            const mode = cat?.config?.mode || 'short';
-            const items = [];
-
-            rows.forEach((row, index) => {
-                const pummog = row.querySelector('.input-pummog').value.trim();
-                const suryang = mode === 'long' ? "" : row.querySelector('.input-suryang').value.trim();
-                items.push({ id: index + 1, pummog, suryang });
-            });
-
-            // [v4.3.1] 단 한 번의 호출로 모든 데이터를 원자적으로 저장하여 충돌 방지
-            const res = await fetch(`/api/inventory/${currentCatId}/bulk`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ items })
-            });
-
-            if (!res.ok) throw new Error('일괄 저장 실패');
-            console.log(`[SYSTEM] ${items.length}개 항목 일괄 저장 완료`);
-        }
-
-        // --- 설정 및 탭 관리 ---
-
-        function openSettings() {
-            if (categories.length === 0) {
-                showToast('초기화되지 않은 상태입니다. 서버 연결을 확인하세요.');
-                return;
+            function closeSettings() {
+                const modal = document.getElementById('modal-settings');
+                modal.classList.remove('show');
+                setTimeout(() => modal.style.display = 'none', 300);
             }
-            const cat = categories.find(c => c.id === currentCatId) || categories[0];
-            document.getElementById('modal-label').textContent = `${cat.name} 설정`;
-            document.getElementById('config-id').value = cat.id; // ID 표시
-            document.getElementById('config-mode').value = cat.config?.mode || 'short';
 
-            // 모드에 따라 개수 설정 동적 변경 (v5.0.5)
-            updateConfigCountOptions(cat.config?.count || (cat.config?.mode === 'long' ? 4 : 9));
-
-            document.getElementById('config-script').value = cat.config?.script_entity || '';
-            document.getElementById('config-name').value = cat.name;
-
-            renderTabMgmtList();
-            const modal = document.getElementById('modal-settings');
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('show'), 10);
-        }
-
-        function closeSettings() {
-            const modal = document.getElementById('modal-settings');
-            modal.classList.remove('show');
-            setTimeout(() => modal.style.display = 'none', 300);
-        }
-
-        function renderTabMgmtList() {
-            const list = document.getElementById('tab-mgmt-list');
-            list.innerHTML = '';
-            categories.forEach(cat => {
-                const item = document.createElement('div');
-                item.className = 'tab-mgmt-item';
-                item.innerHTML = `
+            function renderTabMgmtList() {
+                const list = document.getElementById('tab-mgmt-list');
+                list.innerHTML = '';
+                categories.forEach(cat => {
+                    const item = document.createElement('div');
+                    item.className = 'tab-mgmt-item';
+                    item.innerHTML = `
                     <span style="font-size:0.85rem; opacity:0.8;">${cat.name}</span>
                     <button onclick="deleteCategory('${cat.id}')" style="background:none; border:none; color:var(--error-color); cursor:pointer;">
                         <i class="mdi mdi-trash-can-outline"></i>
                     </button>
                 `;
-                list.appendChild(item);
-            });
-        }
-
-        async function saveCurrentTabSettings() {
-            const name = document.getElementById('config-name').value.trim() || '새 탭';
-            const mode = document.getElementById('config-mode').value;
-            const count = parseInt(document.getElementById('config-count').value);
-            const script_entity = document.getElementById('config-script').value.trim();
-
-            const res = await fetch(`/api/categories/${currentCatId}`, {
-                method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, config: { count, script_entity, mode } })
-            });
-
-            if (res.ok) {
-                showToast('설정이 저장되었습니다.');
-                // 현재 탭 ID를 유지하며 새로고침 (v4.3.2)
-                window.location.href = window.location.pathname + '?catId=' + currentCatId;
-            }
-        }
-
-        async function addNewCategory() {
-            if (categories.length >= 4) return showToast('최대 4개까지만 가능합니다.');
-            const name = prompt('새로운 탭 이름을 입력하세요:', '새 탭');
-            if (name === null) return; // 취소 버튼 클릭 시 중단
-
-            const res = await fetch('/api/categories', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: name.trim() || '새 탭' })
-            });
-            if (res.ok) {
-                const data = await res.json();
-                // 새로 생성된 탭으로 이동 (v4.3.2)
-                window.location.href = window.location.pathname + '?catId=' + data.id;
-            }
-        }
-
-        async function deleteCategory(id) {
-            if (categories.length <= 1) return showToast('최소 1개는 유지해야 합니다.');
-            if (!confirm('정말 삭제하시겠습니까? 데이터가 모두 사라집니다.')) return;
-            const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                // 첫 번째 탭으로 리다이렉트
-                window.location.href = window.location.pathname;
-            }
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        function copyId() {
-            const idInput = document.getElementById('config-id');
-            idInput.select();
-            document.execCommand('copy');
-            showToast('ID가 클립보드에 복사되었습니다.');
-        }
-
-        // [v5.0.5] 모드에 따라 항목 개수 선택 옵션을 동적으로 변경
-        function updateConfigCountOptions(currentCount) {
-            const mode = document.getElementById('config-mode').value;
-            const countSelect = document.getElementById('config-count');
-            const val = currentCount || countSelect.value;
-
-            countSelect.innerHTML = ''; // 초기화
-
-            if (mode === 'long') {
-                // 장기 모드: 3개, 4개 선택 가능
-                const options = [3, 4];
-                options.forEach(num => {
-                    const opt = document.createElement('option');
-                    opt.value = num;
-                    opt.textContent = `${num}개`;
-                    countSelect.appendChild(opt);
+                    list.appendChild(item);
                 });
-                // 기존 값이 유효하면 유지, 아니면 4로 기본값
-                countSelect.value = [3, 4].includes(parseInt(val)) ? val : 4;
-            } else {
-                // 단기 모드: 3개, 6개, 9개 선택 가능
-                const options = [3, 6, 9];
-                options.forEach(num => {
-                    const opt = document.createElement('option');
-                    opt.value = num;
-                    opt.textContent = `${num}개`;
-                    countSelect.appendChild(opt);
-                });
-                // 기존 값이 유효하면 유지, 아니면 9로 기본값
-                countSelect.value = [3, 6, 9].includes(parseInt(val)) ? val : 9;
             }
-        }
-    </script>
+
+            async function saveCurrentTabSettings() {
+                const name = document.getElementById('config-name').value.trim() || '새 탭';
+                const mode = document.getElementById('config-mode').value;
+                const count = parseInt(document.getElementById('config-count').value);
+                const script_entity = document.getElementById('config-script').value.trim();
+
+                const res = await fetch(`/api/categories/${currentCatId}`, {
+                    method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, config: { count, script_entity, mode } })
+                });
+
+                if (res.ok) {
+                    showToast('설정이 저장되었습니다.');
+                    // 현재 탭 ID를 유지하며 새로고침 (v4.3.2)
+                    window.location.href = window.location.pathname + '?catId=' + currentCatId;
+                }
+            }
+
+            async function addNewCategory() {
+                if (categories.length >= 4) return showToast('최대 4개까지만 가능합니다.');
+                const name = prompt('새로운 탭 이름을 입력하세요:', '새 탭');
+                if (name === null) return; // 취소 버튼 클릭 시 중단
+
+                const res = await fetch('/api/categories', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: name.trim() || '새 탭' })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    // 새로 생성된 탭으로 이동 (v4.3.2)
+                    window.location.href = window.location.pathname + '?catId=' + data.id;
+                }
+            }
+
+            async function deleteCategory(id) {
+                if (categories.length <= 1) return showToast('최소 1개는 유지해야 합니다.');
+                if (!confirm('정말 삭제하시겠습니까? 데이터가 모두 사라집니다.')) return;
+                const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    // 첫 번째 탭으로 리다이렉트
+                    window.location.href = window.location.pathname;
+                }
+            }
+
+            function showToast(msg) {
+                const toast = document.getElementById('toast');
+                toast.textContent = msg;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            }
+
+            function copyId() {
+                const idInput = document.getElementById('config-id');
+                idInput.select();
+                document.execCommand('copy');
+                showToast('ID가 클립보드에 복사되었습니다.');
+            }
+
+            // [v5.0.5] 모드에 따라 항목 개수 선택 옵션을 동적으로 변경
+            function updateConfigCountOptions(currentCount) {
+                const mode = document.getElementById('config-mode').value;
+                const countSelect = document.getElementById('config-count');
+                const val = currentCount || countSelect.value;
+
+                countSelect.innerHTML = ''; // 초기화
+
+                if (mode === 'long') {
+                    // 장기 모드: 3개, 4개 선택 가능
+                    const options = [3, 4];
+                    options.forEach(num => {
+                        const opt = document.createElement('option');
+                        opt.value = num;
+                        opt.textContent = `${num}개`;
+                        countSelect.appendChild(opt);
+                    });
+                    // 기존 값이 유효하면 유지, 아니면 4로 기본값
+                    countSelect.value = [3, 4].includes(parseInt(val)) ? val : 4;
+                } else {
+                    // 단기 모드: 3개, 6개, 9개 선택 가능
+                    const options = [3, 6, 9];
+                    options.forEach(num => {
+                        const opt = document.createElement('option');
+                        opt.value = num;
+                        opt.textContent = `${num}개`;
+                        countSelect.appendChild(opt);
+                    });
+                    // 기존 값이 유효하면 유지, 아니면 9로 기본값
+                    countSelect.value = [3, 6, 9].includes(parseInt(val)) ? val : 9;
+                }
+            }
+        </script>
 </body>
 
 </html>

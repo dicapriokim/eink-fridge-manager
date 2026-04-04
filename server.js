@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 console.log('--------------------------------------------------');
-console.log('[eink-fridge-manager] v.5.0.5 (Integrity Audited)');
+console.log('[eink-fridge-manager] v.5.1.2 (Integrity Audited)');
 console.log('--------------------------------------------------');
 
 const generateId = () => `cat_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
@@ -52,7 +52,7 @@ async function readData() {
                     categories.push({
                         id: `legacy_${key}`,
                         name: names[key],
-                        config: { count: 9, script_entity: '' },
+                        config: { count: 9, script_entity: '', mode: 'short' },
                         items: data[key]
                     });
                 }
@@ -149,7 +149,12 @@ app.get('/api/ha/:id', asyncHandler(async (req, res) => {
     const data = await readData();
     const cat = data.categories.find(c => c.id === id);
     if (!cat) return res.status(404).json({ error: 'HA 센서 대상을 찾을 수 없습니다.' });
-    res.json({ items: cat.items || [] });
+    res.json({
+        id: cat.id,
+        name: cat.name,
+        mode: cat.config?.mode || 'short',
+        items: cat.items || []
+    });
 }));
 
 // [Expert] 입력값 검증 (Point 3)
@@ -223,7 +228,7 @@ app.post('/api/refresh/:id', asyncHandler(async (req, res) => {
 
     const itemsToProcess = incomingItems || cat.items || [];
     const mode = cat.config?.mode || 'short';
-    const flattenedVariables = { category: cat.name };
+    const flattenedVariables = { id: id, category: cat.name, mode: mode, count: itemsToProcess.length };
 
     // [Point 2 & Point 3] 만약 새로운 데이터가 왔다면 즉시 저장 (레이스 컨디션 방지)
     if (incomingItems) {
@@ -246,14 +251,15 @@ app.post('/api/refresh/:id', asyncHandler(async (req, res) => {
     const targetUrl = `${base_url}/api/services/${domain}/${service}`;
     const fallbackUrl = `${base_url}/api/services/script/turn_on`;
 
-    console.log(`[HA SYNC] 1차 호출 시도: ${targetUrl}`);
+    // [v5.0.8] 토큰 공백 제거 (안전성 확보)
+    const token = (process.env.HA_TOKEN || '').trim();
 
     try {
         // 1차 시도: 직접 서비스 호출
         let response = await fetch(targetUrl, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${process.env.HA_TOKEN}`,
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(flattenedVariables)
@@ -265,7 +271,7 @@ app.post('/api/refresh/:id', asyncHandler(async (req, res) => {
             const fallbackResponse = await fetch(fallbackUrl, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${process.env.HA_TOKEN}`,
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ entity_id: script_id, variables: flattenedVariables })
@@ -299,5 +305,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`[v.5.0.5] 서버 가동 중: http://localhost:${PORT}`);
+    console.log(`[v.5.1.2] 서버 가동 중: http://localhost:${PORT}`);
 });
