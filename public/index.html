@@ -191,6 +191,19 @@
             font-size: 1.5rem;
         }
 
+        /* [Expert] 시각적 가중치 카운터 스타일 */
+        .weight-indicator {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            min-width: 55px;
+            text-align: right;
+            font-family: inherit;
+            transition: color 0.3s, transform 0.2s;
+            flex-shrink: 0;
+            user-select: none;
+            font-weight: 600;
+        }
+
         .action-area {
             display: flex;
             flex-direction: column;
@@ -483,19 +496,40 @@
         </div>
 
         <script>
-            // [ Expert] 시각적 가중치 기반 입력 통제 (ASCII 1점, 그 외 2점)
+            // [Expert] 시각적 가중치 계산 (ASCII 1점, 그 외 2점)
+            function getVisualWeight(str) {
+                if (!str) return 0;
+                let weight = 0;
+                for (const char of str) {
+                    weight += char.charCodeAt(0) > 128 ? 2 : 1;
+                }
+                return weight;
+            }
+
+            // [Expert] 시각적 가중치 기반 입력 통제 및 카운터 업데이트
             function enforceVisualLength(inputElem, maxWeight) {
+                let v_id = inputElem.id.split('_')[1];
+                let weightIndicator = document.getElementById(`w_${v_id}`);
+
                 let val = inputElem.value;
                 let weight = 0;
                 let result = '';
+
                 for (const char of val) {
                     const charWeight = char.charCodeAt(0) > 128 ? 2 : 1;
                     if (weight + charWeight > maxWeight) break;
                     weight += charWeight;
                     result += char;
                 }
+
                 if (val !== result) {
                     inputElem.value = result;
+                }
+
+                // 카운터 텍스트 업데이트 ("X 자" 형식)
+                if (weightIndicator) {
+                    weightIndicator.textContent = `${weight} 자`;
+                    weightIndicator.style.opacity = weight >= maxWeight ? "1" : "0.6";
                 }
             }
 
@@ -577,41 +611,61 @@
                     div.className = 'list-item';
 
                     if (mode === 'long') {
-                        // 장기 모드: 100% 너비, 수량 없음, 가중치 기반 제한(40점)
+                        // 장기 모드: 버튼 삭제, 자동 저장(onblur), 가중치 표시기("자" 단위) 추가
+                        const weight = getVisualWeight(item.pummog);
                         div.innerHTML = `
-                        <input type="text" class="input-pummog" style="flex:1;" id="p_${item.id}" value="${item.pummog}" placeholder="가득 찰 때까지 유연하게 입력 (한글 20자 공간)" oninput="enforceVisualLength(this, 40)">
-                        <button class="btn-save" onclick="saveRow(${item.id}, this)"><i class="mdi mdi-content-save"></i></button>
+                        <input type="text" class="input-pummog" style="flex:1;" id="p_${item.id}" value="${item.pummog}" 
+                               placeholder="가득 찰 때까지 유연하게 입력" oninput="enforceVisualLength(this, 40)" onblur="saveRow(${item.id})">
+                        <div class="weight-indicator" id="w_${item.id}">${weight} 자</div>
                     `;
                     } else {
-                        // 단기 모드: 기존 6자/3자 구성
+                        // 단기 모드: 버튼 삭제, 자동 저장(onblur)
                         div.innerHTML = `
-                        <input type="text" class="input-pummog" id="p_${item.id}" value="${item.pummog}" placeholder="품목" maxlength="6">
-                        <input type="text" class="input-suryang" id="s_${item.id}" value="${item.suryang}" placeholder="수량" maxlength="3">
-                        <button class="btn-save" onclick="saveRow(${item.id}, this)"><i class="mdi mdi-content-save"></i></button>
+                        <input type="text" class="input-pummog" id="p_${item.id}" value="${item.pummog}" placeholder="품목" maxlength="6" onblur="saveRow(${item.id})">
+                        <input type="text" class="input-suryang" id="s_${item.id}" value="${item.suryang}" placeholder="수량" maxlength="3" onblur="saveRow(${item.id})">
+                        <div class="weight-indicator" id="w_${item.id}" style="visibility:hidden;">0 자</div>
                     `;
                     }
                     container.appendChild(div);
                 }
             }
 
-            async function saveRow(idx, btn) {
+            async function saveRow(idx) {
                 const cat = categories.find(c => c.id === currentCatId);
                 const mode = cat?.config?.mode || 'short';
                 const pummog = document.getElementById(`p_${idx}`).value.trim();
                 const suryang = mode === 'long' ? "" : document.getElementById(`s_${idx}`).value.trim();
-                const icon = btn.querySelector('i');
-                icon.className = 'mdi mdi-loading spin';
+
+                // [Expert] 시각적 피드백: 카운터 색상 변경 (저장 시도 중)
+                const indicator = document.getElementById(`w_${idx}`);
+                if (indicator && mode === 'long') {
+                    indicator.style.color = 'var(--accent-color)';
+                }
+
                 try {
                     const res = await fetch(`/api/inventory/${currentCatId}/${idx}`, {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ pummog, suryang })
                     });
                     if (res.ok) {
-                        btn.classList.add('success');
-                        icon.className = 'mdi mdi-check';
-                        setTimeout(() => { btn.classList.remove('success'); icon.className = 'mdi mdi-content-save'; }, 2000);
+                        // [Expert] 성공 피드백: 초록색으로 잠시 변함
+                        if (indicator && mode === 'long') {
+                            indicator.style.color = 'var(--success-color)';
+                            indicator.style.transform = 'scale(1.1)';
+                            setTimeout(() => {
+                                indicator.style.color = '';
+                                indicator.style.transform = '';
+                            }, 1500);
+                        } else {
+                            console.log(`[Auto-Save] Item ${idx} saved.`);
+                        }
                     }
-                } catch (err) { showToast('저장 실패'); icon.className = 'mdi mdi-alert'; }
+                } catch (err) {
+                    if (indicator && mode === 'long') {
+                        indicator.style.color = 'var(--error-color)';
+                    }
+                    showToast('자동 저장 실패');
+                }
             }
 
             async function refreshEink() {
