@@ -165,9 +165,10 @@ app.get('/api/ha/:id', asyncHandler(async (req, res) => {
 // [Expert] 시각적 가중치 기반 문자열 절삭 (ASCII 1점, 그 외 2점)
 function truncateVisualLength(str, maxWeight) {
     if (!str) return '';
+    const normalized = str.normalize('NFC');
     let weight = 0;
     let result = '';
-    for (const char of str) {
+    for (const char of normalized) {
         const charWeight = char.charCodeAt(0) > 128 ? 2 : 1;
         if (weight + charWeight > maxWeight) break;
         weight += charWeight;

@@ -1,4 +1,4 @@
-# E-ink Fridge Manager (Fridge Inventory Management v5.2.1)
+# E-ink Fridge Manager (Fridge Inventory Management v5.2.4)
 
 <div align="center">
   <img src="docs/images/real_preview.png" width="80%">
@@ -23,6 +23,8 @@
     - **Auto-save on blur**: Data is automatically saved when you leave an input field (only if changed).
     - **Real-time Weight Indicator**: Replaced manual save buttons with a live character count (e.g., "15 자").
     - **Visual Feedback**: The indicator pulses green on successful save.
+    - **Data Integrity**: Stable Unicode handling via NFC normalization.
+    - **Balanced UI**: Clean left-aligned text for better readability.
 
 | Short Mode UI | Long Mode UI |
 | :---: | :---: |
@@ -427,6 +429,8 @@ sequence:
     - **포커스 해제 시 자동 저장**: 입력 필드를 벗어나면 변경 사항이 있을 때만 즉시 저장됩니다.
     - **실시간 가중치 표시기**: 수동 저장 버튼을 없애고 실시간 글자 수(예: "15 자")를 표시합니다.
     - **시각적 피드백**: 저장 성공 시 숫자가 초록색으로 변하여 상태를 알립니다.
+    - **데이터 무결성**: 유니코드 정규화(NFC)를 통한 정확한 글자 수 계산 지원.
+    - **정돈된 UI**: 모든 입력 필드를 좌측 정렬하여 가독성을 높였습니다.
 
 | 단기 모드 UI (Short) | 장기 모드 UI (Long) |
 | :---: | :---: |
