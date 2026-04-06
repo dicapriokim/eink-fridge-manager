@@ -162,11 +162,25 @@ app.get('/api/ha/:id', asyncHandler(async (req, res) => {
     });
 }));
 
+// [Expert] 시각적 가중치 기반 문자열 절삭 (ASCII 1점, 그 외 2점)
+function truncateVisualLength(str, maxWeight) {
+    if (!str) return '';
+    let weight = 0;
+    let result = '';
+    for (const char of str) {
+        const charWeight = char.charCodeAt(0) > 128 ? 2 : 1;
+        if (weight + charWeight > maxWeight) break;
+        weight += charWeight;
+        result += char;
+    }
+    return result;
+}
+
 // [Expert] 입력값 검증 (Point 3)
 function validateItem(item, mode = 'short') {
     if (!item) return false;
     if (mode === 'long') {
-        if (item.pummog && item.pummog.length > 20) item.pummog = item.pummog.substring(0, 20);
+        item.pummog = truncateVisualLength(item.pummog, 40);
         item.suryang = "";
     } else {
         if (item.pummog && item.pummog.length > 6) item.pummog = item.pummog.substring(0, 6);

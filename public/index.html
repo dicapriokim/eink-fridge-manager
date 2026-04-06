@@ -483,6 +483,22 @@
         </div>
 
         <script>
+            // [ Expert] 시각적 가중치 기반 입력 통제 (ASCII 1점, 그 외 2점)
+            function enforceVisualLength(inputElem, maxWeight) {
+                let val = inputElem.value;
+                let weight = 0;
+                let result = '';
+                for (const char of val) {
+                    const charWeight = char.charCodeAt(0) > 128 ? 2 : 1;
+                    if (weight + charWeight > maxWeight) break;
+                    weight += charWeight;
+                    result += char;
+                }
+                if (val !== result) {
+                    inputElem.value = result;
+                }
+            }
+
             let categories = [];
             let currentCatId = null;
             let inventoryItems = [];
@@ -561,9 +577,9 @@
                     div.className = 'list-item';
 
                     if (mode === 'long') {
-                        // 장기 모드: 100% 너비, 수량 없음, 20자 제한
+                        // 장기 모드: 100% 너비, 수량 없음, 가중치 기반 제한(40점)
                         div.innerHTML = `
-                        <input type="text" class="input-pummog" style="flex:1;" id="p_${item.id}" value="${item.pummog}" placeholder="내용을 입력하세요 (최대 20자)" maxlength="20">
+                        <input type="text" class="input-pummog" style="flex:1;" id="p_${item.id}" value="${item.pummog}" placeholder="가득 찰 때까지 유연하게 입력 (한글 20자 공간)" oninput="enforceVisualLength(this, 40)">
                         <button class="btn-save" onclick="saveRow(${item.id}, this)"><i class="mdi mdi-content-save"></i></button>
                     `;
                     } else {
