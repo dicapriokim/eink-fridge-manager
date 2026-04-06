@@ -116,7 +116,8 @@
         .list-item {
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            gap: 12px;
             margin-bottom: 12px;
             animation: slideIn 0.3s ease-out;
         }
@@ -124,12 +125,12 @@
         @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateX(-10px);
+                transform: translateY(10px);
             }
 
             to {
                 opacity: 1;
-                transform: translateX(0);
+                transform: translateY(0);
             }
         }
 
@@ -154,11 +155,12 @@
         }
 
         .input-pummog {
-            flex: 2;
+            width: 200px;
+            text-align: center;
         }
 
         .input-suryang {
-            flex: 1;
+            width: 70px;
             text-align: center;
         }
 
@@ -611,24 +613,25 @@
                     div.className = 'list-item';
 
                     if (mode === 'long') {
-                        // 장기 모드: 버튼 삭제, 자동 저장(onblur), 가중치 표시기("자" 단위) 추가
                         const weight = getVisualWeight(item.pummog);
                         div.innerHTML = `
-                        <input type="text" class="input-pummog" style="flex:1;" id="p_${item.id}" value="${item.pummog}" 
-                               placeholder="가득 찰 때까지 유연하게 입력" 
-                               oninput="enforceVisualLength(this, 40)" 
-                               onfocus="this.dataset.old = this.value" 
-                               onblur="saveRow(${item.id})">
-                        <div class="weight-indicator" id="w_${item.id}">${weight} 자</div>
+                        <div style="display:flex; align-items:center; gap:12px; margin:0 auto; width:fit-content;">
+                            <input type="text" class="input-pummog" style="width:300px;" id="p_${item.id}" value="${item.pummog}" 
+                                   placeholder="내용을 입력하세요" 
+                                   oninput="enforceVisualLength(this, 40)" 
+                                   onfocus="this.dataset.old = this.value" 
+                                   onblur="saveRow(${item.id})">
+                            <div class="weight-indicator" id="w_${item.id}">${weight} 자</div>
+                        </div>
                     `;
                     } else {
-                        // 단기 모드: 버튼 삭제, 자동 저장(onblur)
                         div.innerHTML = `
-                        <input type="text" class="input-pummog" id="p_${item.id}" value="${item.pummog}" placeholder="품목" maxlength="6" 
-                               onfocus="this.dataset.old = this.value" onblur="saveRow(${item.id})">
-                        <input type="text" class="input-suryang" id="s_${item.id}" value="${item.suryang}" placeholder="수량" maxlength="3" 
-                               onfocus="this.dataset.old = this.value" onblur="saveRow(${item.id})">
-                        <div class="weight-indicator" id="w_${item.id}" style="visibility:hidden;">0 자</div>
+                        <div style="display:flex; align-items:center; gap:12px; margin:0 auto; width:fit-content;">
+                            <input type="text" class="input-pummog" id="p_${item.id}" value="${item.pummog}" placeholder="품목" maxlength="6" 
+                                   onfocus="this.dataset.old = this.value" onblur="saveRow(${item.id})">
+                            <input type="text" class="input-suryang" id="s_${item.id}" value="${item.suryang}" placeholder="수량" maxlength="3" 
+                                   onfocus="this.dataset.old = this.value" onblur="saveRow(${item.id})">
+                        </div>
                     `;
                     }
                     container.appendChild(div);
