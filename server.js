@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 console.log('--------------------------------------------------');
-console.log('[eink-fridge-manager] v.5.1.2 (Integrity Audited)');
+console.log('[eink-fridge-manager] v.5.2.4 (Integrity Audited)');
 console.log('--------------------------------------------------');
 
 const generateId = () => `cat_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
@@ -343,5 +343,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`[v.5.1.2] 서버 가동 중: http://localhost:${PORT}`);
+    console.log(`[v.5.2.4] 서버 가동 중: http://localhost:${PORT}`);
 });
