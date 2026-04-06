@@ -615,14 +615,19 @@
                         const weight = getVisualWeight(item.pummog);
                         div.innerHTML = `
                         <input type="text" class="input-pummog" style="flex:1;" id="p_${item.id}" value="${item.pummog}" 
-                               placeholder="가득 찰 때까지 유연하게 입력" oninput="enforceVisualLength(this, 40)" onblur="saveRow(${item.id})">
+                               placeholder="가득 찰 때까지 유연하게 입력" 
+                               oninput="enforceVisualLength(this, 40)" 
+                               onfocus="this.dataset.old = this.value" 
+                               onblur="saveRow(${item.id})">
                         <div class="weight-indicator" id="w_${item.id}">${weight} 자</div>
                     `;
                     } else {
                         // 단기 모드: 버튼 삭제, 자동 저장(onblur)
                         div.innerHTML = `
-                        <input type="text" class="input-pummog" id="p_${item.id}" value="${item.pummog}" placeholder="품목" maxlength="6" onblur="saveRow(${item.id})">
-                        <input type="text" class="input-suryang" id="s_${item.id}" value="${item.suryang}" placeholder="수량" maxlength="3" onblur="saveRow(${item.id})">
+                        <input type="text" class="input-pummog" id="p_${item.id}" value="${item.pummog}" placeholder="품목" maxlength="6" 
+                               onfocus="this.dataset.old = this.value" onblur="saveRow(${item.id})">
+                        <input type="text" class="input-suryang" id="s_${item.id}" value="${item.suryang}" placeholder="수량" maxlength="3" 
+                               onfocus="this.dataset.old = this.value" onblur="saveRow(${item.id})">
                         <div class="weight-indicator" id="w_${item.id}" style="visibility:hidden;">0 자</div>
                     `;
                     }
@@ -633,8 +638,21 @@
             async function saveRow(idx) {
                 const cat = categories.find(c => c.id === currentCatId);
                 const mode = cat?.config?.mode || 'short';
-                const pummog = document.getElementById(`p_${idx}`).value.trim();
-                const suryang = mode === 'long' ? "" : document.getElementById(`s_${idx}`).value.trim();
+
+                const pElem = document.getElementById(`p_${idx}`);
+                const sElem = mode === 'long' ? null : document.getElementById(`s_${idx}`);
+
+                const pummog = pElem.value.trim();
+                const suryang = sElem ? sElem.value.trim() : "";
+
+                // [Expert] 최적화: 변경 사항이 있을 때만 서버 전송
+                const isPChanged = pElem.dataset.old !== pElem.value;
+                const isSChanged = sElem && (sElem.dataset.old !== sElem.value);
+
+                if (!isPChanged && !isSChanged) {
+                    console.log(`[Auto-Save] No changes detected for row ${idx}. Skipping.`);
+                    return;
+                }
 
                 // [Expert] 시각적 피드백: 카운터 색상 변경 (저장 시도 중)
                 const indicator = document.getElementById(`w_${idx}`);
@@ -648,6 +666,10 @@
                         body: JSON.stringify({ pummog, suryang })
                     });
                     if (res.ok) {
+                        // 저장 성공 시 현재 값을 dataset.old에 동기화
+                        pElem.dataset.old = pElem.value;
+                        if (sElem) sElem.dataset.old = sElem.value;
+
                         // [Expert] 성공 피드백: 초록색으로 잠시 변함
                         if (indicator && mode === 'long') {
                             indicator.style.color = 'var(--success-color)';

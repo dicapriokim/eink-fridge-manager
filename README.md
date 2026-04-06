@@ -1,4 +1,4 @@
-# E-ink Fridge Manager (Fridge Inventory Management v5.1.2)
+# E-ink Fridge Manager (Fridge Inventory Management v5.2.1)
 
 <div align="center">
   <img src="docs/images/real_preview.png" width="80%">
@@ -17,8 +17,12 @@
 - **Key Features**:
   - Supports multiple categories (Fridge, Freezer, Pantry, etc.): Manage up to 4 E-ink displays with a single app.
   - **Two Input Modes**:
-    - **Short Mode** (Item+Quantity)
-    - **Long Mode** (Max 20-character text)
+    - **Short Mode** (Item + Quantity)
+    - **Long Mode** (Visual Weight-based: Max 40 points / ~20 Korean chars)
+  - **Intuitive UI/UX**:
+    - **Auto-save on blur**: Data is automatically saved when you leave an input field (only if changed).
+    - **Real-time Weight Indicator**: Replaced manual save buttons with a live character count (e.g., "15 자").
+    - **Visual Feedback**: The indicator pulses green on successful save.
 
 | Short Mode UI | Long Mode UI |
 | :---: | :---: |
@@ -417,8 +421,12 @@ sequence:
 - **주요 기능**:
   - 다중 카테고리 지원 (냉장고, 냉동고, 팬트리 등) : E-ink 디스플레이를 최대 4개까지 앱 하나로 관리.
   - **두 가지 입력 모드 선택 가능**:
-    - **단기 모드**(품목+수량)
-    - **장기 모드**(메모형)
+    - **단기 모드** (품목 + 수량)
+    - **장기 모드** (시각적 가중치 기반: 최대 40점 / 한글 약 20자)
+  - **직관적인 UI/UX**:
+    - **포커스 해제 시 자동 저장**: 입력 필드를 벗어나면 변경 사항이 있을 때만 즉시 저장됩니다.
+    - **실시간 가중치 표시기**: 수동 저장 버튼을 없애고 실시간 글자 수(예: "15 자")를 표시합니다.
+    - **시각적 피드백**: 저장 성공 시 숫자가 초록색으로 변하여 상태를 알립니다.
 
 | 단기 모드 UI (Short) | 장기 모드 UI (Long) |
 | :---: | :---: |
