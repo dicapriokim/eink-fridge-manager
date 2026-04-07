@@ -276,7 +276,7 @@ app.post('/api/refresh/:id', asyncHandler(async (req, res) => {
     itemsToProcess.forEach((item, index) => {
         if (index < 9) { // 최대 9개까지만 변수 주입
             validateItem(item, mode);
-            flattenedVariables[`pummog${index + 1}`] = item.pummog || '';
+            flattenedVariables[`pummog${index + 1}`] = '\uFEFF' + (item.pummog || '').replace(/ /g, '\u00A0');
             flattenedVariables[`suryang${index + 1}`] = item.suryang || '';
         }
     });
