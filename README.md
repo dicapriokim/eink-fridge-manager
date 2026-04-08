@@ -289,18 +289,18 @@ sequence:
                   size: 34
                   color: white
                   value: >-
-                    {% set weather = states('sensor.hyeonjaenalssi') %} {% if
-                    weather in ['sunny', 'clear', 'clear-night', '맑음'] %}
-                      mdi:weather-sunny
-                    {% elif weather in ['cloudy', 'partlycloudy', '흐림', '구름', '구름많음'] %}
-                      mdi:weather-cloudy
-                    {% elif weather in ['rain', 'pouring', '비', '비옴'] %}
-                      mdi:weather-pouring
-                    {% elif weather in ['snow', 'snowy', '눈', '눈옴'] %}
-                      mdi:weather-snowy
-                    {% else %}
-                      mdi:weather-partly-cloudy
-                    {% endif %}
+                      {% set weather = states('YOUR_DEVICE_SENSOR') %}
+                      {% if weather in ['sunny', 'clear', 'clear-night'] %}
+                        mdi:weather-sunny
+                      {% elif weather in ['cloudy', 'partlycloudy', 'overcast'] %}
+                        mdi:weather-cloudy
+                      {% elif weather in ['rain', 'pouring'] %}
+                        mdi:weather-pouring
+                      {% elif weather in ['snow', 'snowy'] %}
+                        mdi:weather-snowy
+                      {% else %}
+                        mdi:weather-partly-cloudy
+                      {% endif %}
             target:
               device_id:
                 - <YOUR_DEVICE_ID>
