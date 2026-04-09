@@ -155,12 +155,10 @@
         }
 
         .input-pummog {
-            width: 200px;
             text-align: left;
         }
 
         .input-suryang {
-            width: 70px;
             text-align: left;
         }
 
@@ -392,6 +390,16 @@
                 transform: rotate(360deg);
             }
         }
+
+        /* [v5.3.0] 모바일 폰트 최적화 옵션 */
+        .small-font .list-item input {
+            font-size: 0.85rem !important;
+            padding: 8px 12px !important;
+        }
+
+        .small-font .weight-indicator {
+            font-size: 0.7rem !important;
+        }
     </style>
 </head>
 
@@ -454,6 +462,14 @@
                         <select id="config-count" style="width: 100%;">
                             <!-- Options will be populated dynamically (v5.0.5) -->
                         </select>
+                    </div>
+
+                    <div class="form-group"
+                        style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.03); padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+                        <input type="checkbox" id="config-mobile-font"
+                            style="width:20px; height:20px; cursor:pointer; margin:0;">
+                        <label class="form-label" for="config-mobile-font" style="margin:0; cursor:pointer; flex:1;">모바일
+                            폰트 작게 (가로폭 확보용)</label>
                     </div>
 
                     <hr style="opacity:0.05; margin:20px 0;">
@@ -608,6 +624,13 @@
                 const mode = cat?.config?.mode || 'short';
                 const count = (cat?.config?.count) ? parseInt(cat.config.count) : (mode === 'long' ? 4 : 9);
 
+                // [v5.3.0] 모바일 폰트 크기 설정 적용
+                if (cat?.config?.mobile_font_small) {
+                    container.classList.add('small-font');
+                } else {
+                    container.classList.remove('small-font');
+                }
+
                 for (let i = 0; i < count; i++) {
                     const item = inventoryItems.find(it => it.id == i + 1) || { id: i + 1, pummog: '', suryang: '' };
                     const div = document.createElement('div');
@@ -616,21 +639,21 @@
                     if (mode === 'long') {
                         const weight = getVisualWeight(item.pummog);
                         div.innerHTML = `
-                        <div style="display:flex; align-items:center; gap:12px; margin:0 auto; width:fit-content;">
-                            <input type="text" class="input-pummog" style="width:300px;" id="p_${item.id}" value="${item.pummog}" 
+                        <div style="display:flex; align-items:center; gap:8px; width:100%; max-width:400px; margin:0 auto;">
+                            <input type="text" class="input-pummog" style="flex:1; min-width:0;" id="p_${item.id}" value="${item.pummog}" 
                                    placeholder="내용을 입력하세요" 
                                    oninput="enforceVisualLength(this, 40)" 
                                    onfocus="this.dataset.old = this.value" 
                                    onblur="saveRow(${item.id})">
-                            <div class="weight-indicator" id="w_${item.id}">${weight} 자</div>
+                            <div class="weight-indicator" id="w_${item.id}" style="flex-shrink:0;">${weight} 자</div>
                         </div>
                     `;
                     } else {
                         div.innerHTML = `
-                        <div style="display:flex; align-items:center; gap:12px; margin:0 auto; width:fit-content;">
-                            <input type="text" class="input-pummog" id="p_${item.id}" value="${item.pummog}" placeholder="품목" maxlength="6" 
+                        <div style="display:flex; align-items:center; gap:8px; width:100%; max-width:400px; margin:0 auto;">
+                            <input type="text" class="input-pummog" style="flex:3; min-width:0;" id="p_${item.id}" value="${item.pummog}" placeholder="품목" maxlength="6" 
                                    onfocus="this.dataset.old = this.value" onblur="saveRow(${item.id})">
-                            <input type="text" class="input-suryang" id="s_${item.id}" value="${item.suryang}" placeholder="수량" maxlength="3" 
+                            <input type="text" class="input-suryang" style="flex:1; min-width:0; max-width:80px;" id="s_${item.id}" value="${item.suryang}" placeholder="수량" maxlength="3" 
                                    onfocus="this.dataset.old = this.value" onblur="saveRow(${item.id})">
                         </div>
                     `;
@@ -786,6 +809,7 @@
 
                 document.getElementById('config-script').value = cat.config?.script_entity || '';
                 document.getElementById('config-name').value = cat.name;
+                document.getElementById('config-mobile-font').checked = !!cat.config?.mobile_font_small;
 
                 renderTabMgmtList();
                 const modal = document.getElementById('modal-settings');
@@ -820,10 +844,11 @@
                 const mode = document.getElementById('config-mode').value;
                 const count = parseInt(document.getElementById('config-count').value);
                 const script_entity = document.getElementById('config-script').value.trim();
+                const mobile_font_small = document.getElementById('config-mobile-font').checked;
 
                 const res = await fetch(`/api/categories/${currentCatId}`, {
                     method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, config: { count, script_entity, mode } })
+                    body: JSON.stringify({ name, config: { count, script_entity, mode, mobile_font_small } })
                 });
 
                 if (res.ok) {
