@@ -185,7 +185,7 @@ sequence:
                   x: 10
                   "y": 8
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog1 | default('') }} {{ suryang1 | default('') }}"
                 - type: rectangle
                   x_start: 10
@@ -197,7 +197,7 @@ sequence:
                   x: 10
                   "y": 40
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog2 | default('') }} {{ suryang2 | default('') }}"
                 - type: rectangle
                   x_start: 10
@@ -209,7 +209,7 @@ sequence:
                   x: 10
                   "y": 72
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog3 | default('') }} {{ suryang3 | default('') }}"
                 - type: rectangle
                   x_start: 10
@@ -221,7 +221,7 @@ sequence:
                   x: 10
                   "y": 104
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog4 | default('') }} {{ suryang4 | default('') }}"
             target:
               device_id:
@@ -251,13 +251,13 @@ sequence:
                   "y": 10
                   color: white
                   size: 18
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "Y-Mart Long-term: {{ category | default('Mart') }}"
                 - type: text
                   x: 10
                   "y": 50
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog1 | default('') }}"
                 - type: rectangle
                   x_start: 10
@@ -269,7 +269,7 @@ sequence:
                   x: 10
                   "y": 75
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog2 | default('') }}"
                 - type: rectangle
                   x_start: 10
@@ -281,7 +281,7 @@ sequence:
                   x: 10
                   "y": 100
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog3 | default('') }}"
                 - type: icon
                   x: 250
@@ -329,25 +329,25 @@ sequence:
                   "y": 10
                   color: white
                   size: 18
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "Y-Mart Short-term: {{ category | default('Mart') }}"
                 - type: text
                   x: 10
                   "y": 50
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog1 | default('') }} {{ suryang1 | default('') }}"
                 - type: text
                   x: 105
                   "y": 50
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog2 | default('') }} {{ suryang2 | default('') }}"
                 - type: text
                   x: 200
                   "y": 50
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog3 | default('') }} {{ suryang3 | default('') }}"
                 - type: rectangle
                   x_start: 10
@@ -359,19 +359,19 @@ sequence:
                   x: 10
                   "y": 75
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog4 | default('') }} {{ suryang4 | default('') }}"
                 - type: text
                   x: 105
                   "y": 75
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog5 | default('') }} {{ suryang5 | default('') }}"
                 - type: text
                   x: 200
                   "y": 75
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog6 | default('') }} {{ suryang6 | default('') }}"
                 - type: rectangle
                   x_start: 10
@@ -383,19 +383,19 @@ sequence:
                   x: 10
                   "y": 100
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog7 | default('') }} {{ suryang7 | default('') }}"
                 - type: text
                   x: 105
                   "y": 100
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog8 | default('') }} {{ suryang8 | default('') }}"
                 - type: text
                   x: 200
                   "y": 100
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog9 | default('') }} {{ suryang9 | default('') }}"
                 - type: icon
                   x: 250
@@ -603,7 +603,7 @@ sequence:
                   x: 10
                   "y": 8
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog1 | default('') }} {{ suryang1 | default('') }}"
                 - type: rectangle
                   x_start: 10
@@ -615,7 +615,7 @@ sequence:
                   x: 10
                   "y": 40
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog2 | default('') }} {{ suryang2 | default('') }}"
                 - type: rectangle
                   x_start: 10
@@ -627,7 +627,7 @@ sequence:
                   x: 10
                   "y": 72
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog3 | default('') }} {{ suryang3 | default('') }}"
                 - type: rectangle
                   x_start: 10
@@ -639,7 +639,7 @@ sequence:
                   x: 10
                   "y": 104
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog4 | default('') }} {{ suryang4 | default('') }}"
             target:
               device_id:
@@ -669,13 +669,13 @@ sequence:
                   "y": 10
                   color: white
                   size: 18
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: Y-Mart 장기보관 {{ category | default('마트') }}
                 - type: text
                   x: 10
                   "y": 50
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog1 | default('') }}"
                 - type: rectangle
                   x_start: 10
@@ -687,7 +687,7 @@ sequence:
                   x: 10
                   "y": 75
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog2 | default('') }}"
                 - type: rectangle
                   x_start: 10
@@ -699,7 +699,7 @@ sequence:
                   x: 10
                   "y": 100
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog3 | default('') }}"
                 - type: icon
                   x: 250
@@ -748,25 +748,25 @@ sequence:
                   "y": 10
                   color: white
                   size: 18
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: Y-Mart 낱개 포장음식 {{ category | default('마트') }}
                 - type: text
                   x: 10
                   "y": 50
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog1 | default('') }} {{ suryang1 | default('') }}"
                 - type: text
                   x: 105
                   "y": 50
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog2 | default('') }} {{ suryang2 | default('') }}"
                 - type: text
                   x: 200
                   "y": 50
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog3 | default('') }} {{ suryang3 | default('') }}"
                 - type: rectangle
                   x_start: 10
@@ -778,19 +778,19 @@ sequence:
                   x: 10
                   "y": 75
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog4 | default('') }} {{ suryang4 | default('') }}"
                 - type: text
                   x: 105
                   "y": 75
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog5 | default('') }} {{ suryang5 | default('') }}"
                 - type: text
                   x: 200
                   "y": 75
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog6 | default('') }} {{ suryang6 | default('') }}"
                 - type: rectangle
                   x_start: 10
@@ -802,19 +802,19 @@ sequence:
                   x: 10
                   "y": 100
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog7 | default('') }} {{ suryang7 | default('') }}"
                 - type: text
                   x: 105
                   "y": 100
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog8 | default('') }} {{ suryang8 | default('') }}"
                 - type: text
                   x: 200
                   "y": 100
                   size: 14
-                  font: fonts/MalangmalangR.ttf
+                  font: fonts/CookieRunRegular.ttf
                   value: "{{ pummog9 | default('') }} {{ suryang9 | default('') }}"
                 - type: icon
                   x: 250
