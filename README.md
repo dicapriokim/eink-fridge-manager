@@ -842,3 +842,15 @@ sequence:
 
 ---
 **Designed by 돼지지렁이 (PigWorm) v.5.2.4**
+---
+
+## 📄 라이선스 (License)
+
+이 프로젝트는 MIT 라이선스 하에 배포됩니다.  
+Copyright (c) 2026 **돼지지렁이**. All rights reserved.
+
+---
+
+### 👑 Contributor
+- **돼지지렁이** (Antigravity Developer)
+
