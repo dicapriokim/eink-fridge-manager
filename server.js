@@ -13,7 +13,9 @@ if (typeof fetch === 'undefined') {
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DATA_FILE = path.join(__dirname, 'data.json');
+const DATA_FILE = path.join(__dirname, 'data', 'data.json');
+const BACKUP_FILE = `${DATA_FILE}.bak`;
+let writeQueue = Promise.resolve();
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -25,21 +27,50 @@ console.log('--------------------------------------------------');
 const generateId = () => `cat_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
 
 async function writeData(data) {
-    const TEMP_FILE = `${DATA_FILE}.tmp`;
-    try {
-        await fs.writeFile(TEMP_FILE, JSON.stringify(data, null, 2), 'utf8');
-        await fs.rename(TEMP_FILE, DATA_FILE);
-    } catch (err) {
-        console.error('[DATABASE] 쓰기 치명적 오류 (원자적 쓰기 실패):', err);
-        // 실패 시 임시 파일 삭제 시도
-        try { await fs.unlink(TEMP_FILE); } catch (e) { }
-    }
+    // [Expert] 동시성 충돌 방지를 위한 순차 처리 큐
+    writeQueue = writeQueue.then(async () => {
+        const TEMP_FILE = `${DATA_FILE}.tmp`;
+        try {
+            // 1. 기존 파일이 있다면 백업 생성 (최소한의 안전장치)
+            try {
+                const exists = await fs.access(DATA_FILE).then(() => true).catch(() => false);
+                if (exists) {
+                    await fs.copyFile(DATA_FILE, BACKUP_FILE);
+                }
+            } catch (e) {
+                console.warn('[DATABASE] 백업 생성 실패 (계속 진행):', e.message);
+            }
+
+            // 2. 임시 파일에 쓰기
+            await fs.writeFile(TEMP_FILE, JSON.stringify(data, null, 2), 'utf8');
+            
+            // 3. 원자적 교체
+            await fs.rename(TEMP_FILE, DATA_FILE);
+        } catch (err) {
+            console.error('[DATABASE] 쓰기 치명적 오류 (원자적 쓰기 실패):', err);
+            try { await fs.unlink(TEMP_FILE); } catch (e) { }
+            throw err; // 상위 핸들러로 에러 전파
+        }
+    }).catch(err => {
+        console.error('[DATABASE] 큐 처리 중 오류:', err);
+    });
+    return writeQueue;
 }
 
 async function readData() {
     try {
         const raw = await fs.readFile(DATA_FILE, 'utf8');
-        let data = JSON.parse(raw);
+        let data;
+        try {
+            data = JSON.parse(raw);
+        } catch (parseErr) {
+            console.error('[DATABASE] 메인 파일 파손 감지, 백업 복구 시도:', parseErr.message);
+            const bakRaw = await fs.readFile(BACKUP_FILE, 'utf8');
+            data = JSON.parse(bakRaw);
+            // 복구 성공 시 메인 파일로 다시 쓰기 시도
+            await fs.writeFile(DATA_FILE, bakRaw, 'utf8');
+            console.log('[DATABASE] 백업 파일로부터 성공적으로 복구되었습니다.');
+        }
 
         if (!data.categories) {
             console.log('[MIGRATION] v3 -> v4 시스템 마이그레이션 실행...');
@@ -78,7 +109,7 @@ async function readData() {
             await writeData(initial);
             return initial;
         }
-        console.error('[DATABASE] 읽기 무결성 훼손:', err);
+        console.error('[DATABASE] 읽기 치명적 무결성 훼손 (백업 없음 또는 백업 파손):', err);
         return { categories: [] };
     }
 }

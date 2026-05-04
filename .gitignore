@@ -5,3 +5,4 @@ node_modules/
 deploy.bat
 docker-compose.yml
 data.json
+data/
